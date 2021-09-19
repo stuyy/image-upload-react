@@ -12,6 +12,8 @@ import { IoCloudUploadOutline } from 'react-icons/io5';
 import { ImagePreview } from './ImagePreview';
 import { postUploadImage } from '../utils/api';
 import { useHistory } from 'react-router';
+import { Spinner } from './Spinner';
+import { ClipLoader } from 'react-spinners';
 
 export const ImageUpload = () => {
   const imageUploadRef = useRef<HTMLDivElement>(null);
@@ -89,6 +91,7 @@ export const ImageUpload = () => {
 
   return (
     <Container>
+      {loading && <Spinner children={<ClipLoader color="#fff" />} />}
       <ImageUploadContainer
         ref={imageUploadRef}
         showBorder={showBorder}

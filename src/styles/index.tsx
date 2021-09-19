@@ -118,6 +118,7 @@ export const Overlay = styled.div`
   justify-content: center;
   align-items: center;
   animation: ${fadeIn} 200ms;
+  z-index: 999;
 `;
 
 export const CloseIcon = styled.div`

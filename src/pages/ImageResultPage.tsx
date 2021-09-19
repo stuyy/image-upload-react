@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouteMatch } from 'react-router';
+import { BarLoader } from 'react-spinners';
+import { Spinner } from '../components/Spinner';
 import { Page } from '../styles';
 import { getUploadedImage } from '../utils/api';
 
@@ -25,7 +27,7 @@ export const ImageResultPage = () => {
   }, []);
 
   return loading ? (
-    <div>Loading</div>
+    <Spinner children={<BarLoader color="#fff" />} />
   ) : (
     <Page
       flexDirection="column"
