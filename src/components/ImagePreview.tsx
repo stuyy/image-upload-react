@@ -19,7 +19,7 @@ export const ImagePreview = ({ source, reset }: ImagePreviewProps) => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  });
+  }, []);
 
   const onOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();

@@ -146,3 +146,23 @@ export const Flex = styled.div<FlexProps>`
   flex-grow: ${({ flexGrow }) => flexGrow};
   flex-direction: ${({ flexDirection }) => flexDirection};
 `;
+
+export const Checkbox = styled.input`
+  ${({ type }) =>
+    type === 'checkbox' &&
+    css`
+      height: 16px;
+      width: 16px;
+      margin: 0;
+    `}
+`;
+
+export const ImageOptionsContainer = styled.section`
+  width: 100%;
+  margin-top: 10px;
+  background-color: #383838;
+  border-radius: 10px;
+  box-sizing: border-box;
+  padding: 20px 30px;
+  display: flex;
+`;
