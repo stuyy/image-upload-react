@@ -27,6 +27,7 @@ export const ImageUploadPage = () => {
   const { onFileChange, onDrop, onDragLeave, onDragOver } = handlers;
   const [imageOptions, setImageOptions] =
     useState<ImageOptionsType>(defaultImageOptions);
+  const { isNSFW, isProtected, password } = imageOptions;
   const [loading, setLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const history = useHistory();
@@ -62,9 +63,13 @@ export const ImageUploadPage = () => {
         setLoading(true);
         const data = new FormData();
         data.append('file', file);
-        data.append('isNSFW', `${imageOptions.isNSFW}`);
-        data.append('isProtected', `${imageOptions.isProtected}`);
-        data.append('password', `${imageOptions.password}`);
+        data.append('isNSFW', `${isNSFW}`);
+        data.append('isProtected', `${isProtected}`);
+        data.append('password', `${password}`);
+        if (isProtected) {
+          localStorage.setItem('showImageResult', JSON.stringify(true));
+          localStorage.setItem('imagePassword', password);
+        }
         const { data: key } = await postUploadImage(data);
         history.push(`/img/${key}`);
       } catch (err) {

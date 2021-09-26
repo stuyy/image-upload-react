@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useRouteMatch } from 'react-router';
+import { useLocation, useRouteMatch } from 'react-router';
 import { BarLoader } from 'react-spinners';
 import { Spinner } from '../components/Spinner';
 import {
@@ -16,30 +16,53 @@ export const ImageResultPage = () => {
   const [loading, setLoading] = useState(false);
   const [source, setSource] = useState('');
   const [isProtected, setIsProtected] = useState(false);
+  const [bypass, setBypass] = useState(false);
   const [password, setPassword] = useState('');
   const [validated, setValidated] = useState(false);
   const { params } = useRouteMatch<{ key: string }>();
 
   useEffect(() => {
-    const callApi = async () => {
-      try {
-        setLoading(true);
-        const { data: imageRef } = await getImageReference(params.key);
-        imageRef.isProtected
-          ? setIsProtected(true)
-          : setSource(`${SPACES_URL}/${imageRef.imageId}`);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    callApi();
+    const showImageResult = JSON.parse(
+      localStorage.getItem('showImageResult') || 'false'
+    );
+    const imagePassword = localStorage.getItem('imagePassword');
+    localStorage.clear();
+    if (showImageResult && imagePassword) {
+      bypassImageProtection(imagePassword);
+    } else callApi();
   }, []);
+
+  const bypassImageProtection = async (password: string) => {
+    try {
+      setLoading(true);
+      const { data } = await getProtectedImage(params.key, password);
+      const blob = new Blob([data]);
+      console.log(URL.createObjectURL(blob));
+      setSource(URL.createObjectURL(blob));
+      setBypass(true);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const callApi = async () => {
+    try {
+      setLoading(true);
+      const { data: imageRef } = await getImageReference(params.key);
+      imageRef.isProtected
+        ? setIsProtected(true)
+        : setSource(`${SPACES_URL}/${imageRef.imageId}`);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const submitPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(password);
     try {
       setLoading(true);
       const { data } = await getProtectedImage(params.key, password);
@@ -54,16 +77,27 @@ export const ImageResultPage = () => {
     }
   };
 
-  return loading ? (
-    <Spinner children={<BarLoader color="#fff" />} />
-  ) : (
+  const imageComponent = (
     <Page
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
       flex
     >
-      {isProtected && !validated ? (
+      <img src={source} alt="img" width={800} />
+    </Page>
+  );
+
+  if (loading) return <Spinner children={<BarLoader color="#fff" />} />;
+  if (bypass) return imageComponent;
+  if (isProtected && !validated) {
+    return (
+      <Page
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        flex
+      >
         <form onSubmit={submitPassword}>
           <InputContainer>
             <Flex>
@@ -77,9 +111,7 @@ export const ImageResultPage = () => {
             />
           </InputContainer>
         </form>
-      ) : (
-        <img src={source} alt="img" width={800} />
-      )}
-    </Page>
-  );
+      </Page>
+    );
+  } else return imageComponent;
 };
