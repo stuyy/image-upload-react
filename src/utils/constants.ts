@@ -12,3 +12,5 @@ export const defaultImage: ImageType = {
   file: undefined,
   hover: false,
 };
+
+export const SPACES_URL = 'https://imguploader.nyc3.digitaloceanspaces.com';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { ImageResultPage } from './pages/ImageResultPage';
 import { ImageUploadPage } from './pages/ImageUploadPage';

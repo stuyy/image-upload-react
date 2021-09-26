@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ImageReferenceType } from './types';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -9,5 +10,12 @@ export const postUploadImage = (data: FormData) =>
     },
   });
 
-export const getUploadedImage = (key: string) =>
-  axios.get(`${API_URL}/image/${key}`);
+export const getProtectedImage = (imageId: string, password: string) =>
+  axios.post(
+    `${API_URL}/image/${imageId}`,
+    { password },
+    { responseType: 'arraybuffer' }
+  );
+
+export const getImageReference = (imageId: string) =>
+  axios.get<ImageReferenceType>(`${API_URL}/image/${imageId}/reference`);
