@@ -33,7 +33,7 @@ export function useImageUpload() {
     e.stopPropagation();
     e.preventDefault();
     console.log(e);
-    setImage((prevState) => ({ ...prevState, hover: false }));
+    setImage((prevState) => ({ ...prevState, hover: true }));
   };
 
   const onDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
