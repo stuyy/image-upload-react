@@ -7,6 +7,6 @@ export type ImageOptionsType = {
 
 export type ImageType = {
   source: string;
-  file: File;
+  file: File | undefined;
   hover: boolean;
 };

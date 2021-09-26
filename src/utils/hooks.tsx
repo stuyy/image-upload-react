@@ -1,10 +1,9 @@
 import { useState } from 'react';
+import { defaultImage } from './constants';
+import { ImageType } from './types';
 
 export function useImageUpload() {
-  const [image, setImage] = useState();
-  const [source, setSource] = useState('');
-  const [file, setFile] = useState<File>();
-  const [showBorder, setShowBorder] = useState(false);
+  const [image, setImage] = useState<ImageType>(defaultImage);
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -12,8 +11,8 @@ export function useImageUpload() {
     if (files && files.length) {
       const file = files.item(0);
       if (file) {
-        setSource(URL.createObjectURL(file));
-        setFile(file);
+        const source = URL.createObjectURL(file);
+        setImage((prevState) => ({ ...prevState, source, file }));
       }
     }
   };
@@ -21,12 +20,12 @@ export function useImageUpload() {
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.stopPropagation();
     e.preventDefault();
-    setShowBorder(false);
+    setImage((prevState) => ({ ...prevState, hover: false }));
     const { files } = e.dataTransfer;
     const file = files.item(0);
     if (file) {
-      setSource(URL.createObjectURL(file));
-      setFile(file);
+      const source = URL.createObjectURL(file);
+      setImage((prevState) => ({ ...prevState, source, file }));
     }
   };
 
@@ -34,23 +33,24 @@ export function useImageUpload() {
     e.stopPropagation();
     e.preventDefault();
     console.log(e);
-    setShowBorder(true);
+    setImage((prevState) => ({ ...prevState, hover: false }));
   };
 
   const onDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.stopPropagation();
     e.preventDefault();
     console.log(e);
-    setShowBorder(false);
+    setImage((prevState) => ({ ...prevState, hover: false }));
   };
 
   return {
-    source,
-    file,
-    showBorder,
-    onFileChange,
-    onDrop,
-    onDragOver,
-    onDragLeave,
+    image,
+    setImage,
+    handlers: {
+      onFileChange,
+      onDrop,
+      onDragOver,
+      onDragLeave,
+    },
   };
 }

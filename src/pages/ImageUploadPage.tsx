@@ -16,42 +16,29 @@ import {
   Text,
 } from '../styles';
 import { postUploadImage } from '../utils/api';
+import { defaultImageOptions } from '../utils/constants';
 import { useImageUpload } from '../utils/hooks';
 import { ImageOptionsType } from '../utils/types';
 
 export const ImageUploadPage = () => {
   const imageUploadRef = useRef<HTMLDivElement>(null);
-  const {
-    file,
-    source,
-    showBorder,
-    onFileChange,
-    onDrop,
-    onDragLeave,
-    onDragOver,
-  } = useImageUpload();
+  const { image, setImage, handlers } = useImageUpload();
+  const { source, file, hover } = image;
+  const { onFileChange, onDrop, onDragLeave, onDragOver } = handlers;
+  const [imageOptions, setImageOptions] =
+    useState<ImageOptionsType>(defaultImageOptions);
   const [loading, setLoading] = useState(false);
-  const [imageOptions, setImageOptions] = useState<ImageOptionsType>({
-    isNSFW: false,
-    isProtected: false,
-    password: '',
-    error: '',
-  });
-
   const formRef = useRef<HTMLFormElement>(null);
   const history = useHistory();
-
   const isDisabled = () => loading || !file;
-
   const reset = () => {
-    setFile(undefined);
-    setSource('');
     const newState = {
       isNSFW: false,
       isProtected: false,
       password: '',
       error: '',
     };
+    setImage({ file: undefined, source: '', hover: false });
     setImageOptions(newState);
     formRef.current?.reset();
   };
@@ -75,6 +62,9 @@ export const ImageUploadPage = () => {
         setLoading(true);
         const data = new FormData();
         data.append('file', file);
+        data.append('isNSFW', `${imageOptions.isNSFW}`);
+        data.append('isProtected', `${imageOptions.isProtected}`);
+        data.append('password', `${imageOptions.password}`);
         const { data: key } = await postUploadImage(data);
         history.push(`/img/${key}`);
       } catch (err) {
@@ -107,10 +97,10 @@ export const ImageUploadPage = () => {
         {loading && <Spinner children={<ClipLoader color="#fff" />} />}
         <ImageUploadContainer
           ref={imageUploadRef}
-          showBorder={showBorder}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
+          showBorder={hover}
+          onDragOver={onDragOver}
+          onDragLeave={onDragLeave}
+          onDrop={onDrop}
           onClick={handleClick}
         >
           <form ref={formRef}>
@@ -124,7 +114,7 @@ export const ImageUploadPage = () => {
               id="file"
               type="file"
               accept="image/jpg, image/jpeg, image/png"
-              onChange={handleFileChange}
+              onChange={onFileChange}
             />
           </form>
           {source && <ImagePreview source={source} reset={reset} />}
