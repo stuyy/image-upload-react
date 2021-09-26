@@ -1,10 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { IoCloudUploadOutline } from 'react-icons/io5';
 import { useHistory } from 'react-router';
 import { ClipLoader } from 'react-spinners';
 import { ImageOptions } from '../components/ImageOptions';
 import { ImagePreview } from '../components/ImagePreview';
-import { ImageUpload } from '../components/ImageUpload';
 import { Spinner } from '../components/Spinner';
 import {
   Button,
@@ -17,13 +16,28 @@ import {
   Text,
 } from '../styles';
 import { postUploadImage } from '../utils/api';
+import { useImageUpload } from '../utils/hooks';
+import { ImageOptionsType } from '../utils/types';
 
 export const ImageUploadPage = () => {
   const imageUploadRef = useRef<HTMLDivElement>(null);
-  const [showBorder, setShowBorder] = useState(false);
-  const [source, setSource] = useState('');
-  const [file, setFile] = useState<File>();
+  const {
+    file,
+    source,
+    showBorder,
+    onFileChange,
+    onDrop,
+    onDragLeave,
+    onDragOver,
+  } = useImageUpload();
   const [loading, setLoading] = useState(false);
+  const [imageOptions, setImageOptions] = useState<ImageOptionsType>({
+    isNSFW: false,
+    isProtected: false,
+    password: '',
+    error: '',
+  });
+
   const formRef = useRef<HTMLFormElement>(null);
   const history = useHistory();
 
@@ -32,21 +46,46 @@ export const ImageUploadPage = () => {
   const reset = () => {
     setFile(undefined);
     setSource('');
+    const newState = {
+      isNSFW: false,
+      isProtected: false,
+      password: '',
+      error: '',
+    };
+    setImageOptions(newState);
     formRef.current?.reset();
+  };
+
+  const checkImagePassword = () => {
+    if (imageOptions.isProtected) {
+      if (!imageOptions.password) {
+        const error = 'Password Required';
+        setImageOptions((prevState) => ({ ...prevState, error }));
+        return false;
+      }
+    }
+    setImageOptions((prevState) => ({ ...prevState, error: '' }));
+    return true;
   };
 
   const uploadImage = async () => {
     if (!file) return;
-    try {
-      setLoading(true);
-      const data = new FormData();
-      data.append('file', file);
-      const { data: key } = await postUploadImage(data);
-      history.push(`/img/${key}`);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
+    if (checkImagePassword()) {
+      try {
+        setLoading(true);
+        const data = new FormData();
+        data.append('file', file);
+        const { data: key } = await postUploadImage(data);
+        history.push(`/img/${key}`);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      console.log(
+        'Image Password was set to true, but no password was specified.'
+      );
     }
   };
 
@@ -54,44 +93,6 @@ export const ImageUploadPage = () => {
     if (e.target === imageUploadRef.current) {
       const fileInput = formRef.current?.childNodes.item(2) as HTMLInputElement;
       fileInput.click();
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    console.log(e);
-    setShowBorder(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    console.log(e);
-    setShowBorder(false);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setShowBorder(false);
-    const { files } = e.dataTransfer;
-    const file = files.item(0);
-    if (file) {
-      setSource(URL.createObjectURL(file));
-      setFile(file);
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const { files } = e.target;
-    if (files && files.length) {
-      const file = files.item(0);
-      if (file) {
-        setSource(URL.createObjectURL(file));
-        setFile(file);
-      }
     }
   };
 
@@ -128,7 +129,12 @@ export const ImageUploadPage = () => {
           </form>
           {source && <ImagePreview source={source} reset={reset} />}
         </ImageUploadContainer>
-        {file && <ImageOptions />}
+        {file && (
+          <ImageOptions
+            imageOptions={imageOptions}
+            setImageOptions={setImageOptions}
+          />
+        )}
         <Button
           style={{ margin: '10px 0' }}
           onClick={uploadImage}

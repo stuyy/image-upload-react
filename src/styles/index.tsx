@@ -161,8 +161,51 @@ export const ImageOptionsContainer = styled.section`
   width: 100%;
   margin-top: 10px;
   background-color: #383838;
-  border-radius: 10px;
+  border-radius: 5px;
   box-sizing: border-box;
-  padding: 20px 30px;
+  padding: 20px 0px;
   display: flex;
+`;
+
+export type InputContainerProps = Partial<{
+  error: any;
+}>;
+
+export const InputContainer = styled.div<InputContainerProps>`
+  background-color: #383838;
+  border: 2px solid #383838;
+  outline: none;
+  box-sizing: border-box;
+  padding: 12px 20px;
+  border-radius: 5px;
+  width: 100%;
+  transition: 200ms border ease-in-out;
+  ${({ error }) =>
+    error &&
+    css`
+      border: 2px solid red;
+    `}
+`;
+
+export const InputLabel = styled.label`
+  font-size: 12px;
+`;
+
+export const InputErrorMessage = styled.span`
+  font-size: 12px;
+  text-transform: uppercase;
+  color: red;
+  animation: ${fadeIn} 200ms;
+`;
+
+export const PasswordField = styled.input`
+  outline: none;
+  border: none;
+  font-family: 'DM Sans';
+  font-size: 16px;
+  color: white;
+  padding: 0;
+  width: 100%;
+  background-color: inherit;
+  height: 15px;
 `;

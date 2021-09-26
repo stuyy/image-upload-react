@@ -20,6 +20,22 @@ Problem:
 - Write Test Cases
 - Invoke Digital Ocean Spaces API to check if the UUID generated exists for a file.
 - Add a component that allows users to configure what they want to do with the image before publishing it.
+- Integrate MySQL with the back end API
+- Save image data to the database
+  - Save Image's ID/Key
+  - Save Image URL
+  - Save NSFW/Private/Protected Flag
+  - Save Password (if any)
+- We will need to also save any settings for the image (nsfw, spoiler, private)
+  - We will also need to save a password for the image if there are any
+- For protected images:
+  - On the front-end, we will call the Nest.js API with the image's key/id.
+  - Check the database and find the correct image by key/id.
+    - If the image is found, check if the image is public or private/protected.
+      - If the image is public, we can return.
+      - If the image is private. We will need to download the image manually from the Spaces.
+- Allow user to upload a public/private image. Need to update back-end to set the read permission to PUBLIC or Private.
+- If image is not found, redirect to a 404
 
 # Suggestions
 
