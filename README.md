@@ -1,23 +1,21 @@
 # Building an Image Hosting Site
 
-Front End
+This is an image hosting web app that I had built during my livestream. The front-end has features such as:
 
-- For the user to upload the image
-- Allow drag & drop
-- We can show a preview
+- Drag and Drop
+- Password Protected Images
+- Preview & Overlay
 
-Back End
+The back-end has features such as:
 
-- Handle photos/files
-- Back-end will call Spaces API to save the image sent from the front-end
+- Communicating with MySQL using TypeORM
+- Communicating with Digital Ocean's Space API using AWS S3 SDK to store images
 
-Problem:
+This is the code repository for an image uploading service replica that I built during my livestream. You can find the livestreams here:
 
-- Find out how to generate unique code that maps to the image the user uploaded.
+Part #1: https://www.youtube.com/watch?v=g6RszzV-PRs
 
-# Done
+Part #2: https://www.youtube.com/watch?v=uy4LRiIs7mw
 
-- Install React Router Dom
-- Send the image id to the front-end
-- On the front-end we navigate to a route with the image id as the parameter.
-  - On this page, we display the image to the user.
+Part #3: https://www.youtube.com/watch?v=m611Q_dL2OA
+
